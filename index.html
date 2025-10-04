@@ -59,6 +59,12 @@
     .photo-card img{width:100%;height:140px;object-fit:cover}
     .caption{padding:8px;font-weight:600}
     .result{margin-top:12px;font-weight:600}
+    /* պարտադիր դաշտի աստերիսկ */
+    label[for]::after{
+      content:" *";
+      color:#c82333;
+      margin-left:2px;
+    }
   </style>
 </head>
 <body>
@@ -68,11 +74,14 @@
     <!-- Ֆայլի պահպանում -->
     <div class="card">
       <h2>Ավելացնել համարանիշ</h2>
-      <label>Համարանիշ</label>
-      <input id="plateInput" type="text" placeholder="Մուտքագրեք համարանիշը">
+      <label for="plateInput">Համարանիշ</label>
+      <input id="plateInput" type="text" placeholder="Մուտքագրեք համարանիշը" required>
 
-      <label>Նկար (jpg/png)</label>
-      <input id="photoInput" type="file" accept="image/*">
+      <label for="middleInput">Միջին անուն</label>
+      <input id="middleInput" type="text" placeholder="Մուտքագրեք միջին անունը" required>
+
+      <label for="photoInput">Նկար (jpg/png)</label>
+      <input id="photoInput" type="file" accept="image/*" required>
 
       <button onclick="savePlate()">Պահպանել</button>
     </div>
@@ -80,7 +89,7 @@
     <!-- Որոնում -->
     <div class="card">
       <h2>Որոնել համարանիշով</h2>
-      <label>Մուտքագրեք համարանիշը</label>
+      <label for="searchInput">Մուտքագրեք համարանիշը</label>
       <input id="searchInput" type="text" placeholder="Օր․ 33 AA 555">
       <button onclick="searchPlate()">Որոնել</button>
       <div id="searchResult" class="result"></div>
@@ -105,7 +114,7 @@
       card.className="photo-card";
       card.innerHTML = `
         <img src="${item.img}" alt="photo">
-        <div class="caption">${item.plate}</div>
+        <div class="caption">${item.plate} - ${item.middle}</div>
       `;
       list.appendChild(card);
     });
@@ -113,14 +122,19 @@
 
   function savePlate(){
     const plate = document.getElementById("plateInput").value.trim();
+    const middle = document.getElementById("middleInput").value.trim();
     const file = document.getElementById("photoInput").files[0];
-    if(!plate || !file){alert("Լրացրեք դաշտերը!");return;}
+    if(!plate || !middle || !file){
+      alert("Լրացրեք բոլոր դաշտերը!");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = function(e){
-      plates.push({plate:plate, img:e.target.result});
+      plates.push({plate:plate, middle:middle, img:e.target.result});
       localStorage.setItem("plates", JSON.stringify(plates));
       renderPlates();
       document.getElementById("plateInput").value="";
+      document.getElementById("middleInput").value="";
       document.getElementById("photoInput").value="";
     }
     reader.readAsDataURL(file);
@@ -133,7 +147,7 @@
     if(found){
       res.innerHTML = `<span style="color:green">Գտնվեց ✅</span><br>
                        <img src="${found.img}" width="200"><br>
-                       ${found.plate}`;
+                       ${found.plate} - ${found.middle}`;
     }else{
       res.innerHTML = `<span style="color:red">Չի գտնվել ❌</span>`;
     }
