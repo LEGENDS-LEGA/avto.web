@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ավտոմեքենաների համարանիշներ</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Ավտոմեքենաների համարանիշների բազա</h1>
+
+        <!-- Форма загрузки фото и номера -->
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <label for="plate">Համարանիշ</label>
+            <input type="text" id="plate" name="plate" placeholder="Մուտքագրեք համարանիշը" required>
+
+            <label for="photo">Նկար (jpg/png)</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+
+            <button type="submit">Պահպանել</button>
+        </form>
+
+        <hr>
+
+        <!-- Форма поиска -->
+        <form id="searchForm" action="/search" method="get">
+            <label for="searchPlate">Որոնել համարանիշով</label>
+            <input type="text" id="searchPlate" name="plate" placeholder="Մուտքագրեք համարանիշը" required>
+            <button type="submit">Որոնել</button>
+        </form>
+
+        <div id="results">
+            <!-- Тут будут отображаться найденные фото -->
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
