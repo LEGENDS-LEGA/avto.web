@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ավտոմեքենաների համարանիշների բազա</title>
+  <style>
+    :root{
+      --bg:#f5f6fa;
+      --card:#ffffff;
+      --text:#222;
+      --muted:#6b7280;
+      --accent:#3b82f6;
+      --accent-2:#2563eb;
+      --border:#e6e9ef;
+      --radius:10px;
+      --shadow:0 6px 18px rgba(18,24,40,0.06);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:20px;
+      line-height:1.4;
+    }
+    .container{max-width:800px;margin:auto}
+    h1{margin-bottom:16px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      margin-bottom:20px;
+      box-shadow:var(--shadow);
+    }
+    label{font-weight:600;display:block;margin-bottom:6px}
+    input[type="text"]{
+      width:100%;padding:10px;border:1px solid var(--border);
+      border-radius:8px;margin-bottom:10px
+    }
+    input[type="file"]{margin-bottom:10px}
+    button{
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button:hover{background:var(--accent-2)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:16px}
+    .photo-card{
+      background:#fff;border:1px solid var(--border);
+      border-radius:8px;overflow:hidden;text-align:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05)
+    }
+    .photo-card img{width:100%;height:140px;object-fit:cover}
+    .caption{padding:8px;font-weight:600}
+    .result{margin-top:12px;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ավտոմեքենաների համարանիշների բազա</h1>
+
+    <!-- Ֆայլի պահպանում -->
+    <div class="card">
+      <h2>Ավելացնել համարանիշ</h2>
+      <label>Համարանիշ</label>
+      <input id="plateInput" type="text" placeholder="Մուտքագրեք համարանիշը">
+
+      <label>Նկար (jpg/png)</label>
+      <input id="photoInput" type="file" accept="image/*">
+
+      <button onclick="savePlate()">Պահպանել</button>
+    </div>
+
+    <!-- Որոնում -->
+    <div class="card">
+      <h2>Որոնել համարանիշով</h2>
+      <label>Մուտքագրեք համարանիշը</label>
+      <input id="searchInput" type="text" placeholder="Օր․ 33 AA 555">
+      <button onclick="searchPlate()">Որոնել</button>
+      <div id="searchResult" class="result"></div>
+    </div>
+
+    <!-- Ցուցակ -->
+    <div class="card">
+      <h2>Պահպանված համարանիշներ</h2>
+      <div id="plateList" class="grid"></div>
+    </div>
+  </div>
+
+<script>
+  // բազա պահում ենք localStorage-ում
+  let plates = JSON.parse(localStorage.getItem("plates") || "[]");
+
+  function renderPlates(){
+    const list = document.getElementById("plateList");
+    list.innerHTML = "";
+    plates.forEach(item=>{
+      const card = document.createElement("div");
+      card.className="photo-card";
+      card.innerHTML = `
+        <img src="${item.img}" alt="photo">
+        <div class="caption">${item.plate}</div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  function savePlate(){
+    const plate = document.getElementById("plateInput").value.trim();
+    const file = document.getElementById("photoInput").files[0];
+    if(!plate || !file){alert("Լրացրեք դաշտերը!");return;}
+    const reader = new FileReader();
+    reader.onload = function(e){
+      plates.push({plate:plate, img:e.target.result});
+      localStorage.setItem("plates", JSON.stringify(plates));
+      renderPlates();
+      document.getElementById("plateInput").value="";
+      document.getElementById("photoInput").value="";
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function searchPlate(){
+    const val = document.getElementById("searchInput").value.trim();
+    const res = document.getElementById("searchResult");
+    const found = plates.find(p=>p.plate.toLowerCase()===val.toLowerCase());
+    if(found){
+      res.innerHTML = `<span style="color:green">Գտնվեց ✅</span><br>
+                       <img src="${found.img}" width="200"><br>
+                       ${found.plate}`;
+    }else{
+      res.innerHTML = `<span style="color:red">Չի գտնվել ❌</span>`;
+    }
+  }
+
+  // էջի բեռնումից հետո
+  renderPlates();
+</script>
+</body>
+</html>
